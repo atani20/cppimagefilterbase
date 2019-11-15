@@ -11,24 +11,27 @@ vector <pair<string, Rect>> ParseConfig(string fileName) {
 	ifstream file(fileName);
 	string str;
 	vector <pair<string, Rect>> config;
-	while (getline(file, str)) {
+	getline(file, str);
+	//while (getline(file, str)) {
 		int pos = str.find(" ");
-		if (pos == std::string::npos)
-			continue;
-		string filterName = str.substr(0, pos);
-		str.erase(0, pos + 1);
-		stringstream sStr(str);
-		vector<int> coef;
-		for (int i; sStr >> i;) {
-			coef.push_back(i);
-		//	if (sStr.peek() == ' ')
-			//	sStr.ignore();
+		if (pos == std::string::npos);
+			//continue;
+		else {
+			string filterName = str.substr(0, pos);
+			str.erase(0, pos + 1);
+			stringstream sStr(str);
+			vector<int> coef;
+			for (int i; sStr >> i;) {
+				coef.push_back(i);
+				//	if (sStr.peek() == ' ')
+					//	sStr.ignore();
+			}
+			if (coef.size() == 4) {
+				Rect rc(coef[0], coef[1], coef[2], coef[3]);
+				config.push_back(make_pair(filterName, rc));
+			}
 		}
-		if (coef.size() == 4) {
-			Rect rc(coef[0], coef[1], coef[2], coef[3]);
-			config.push_back(make_pair(filterName, rc));
-		}
-	}
+	//}
 	file.close();
 	return config;
 }
