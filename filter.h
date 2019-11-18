@@ -25,16 +25,14 @@ public:
 
 class Threshold : public Filter {
 private:
-	int blockSize;
-	void setNewIntensity(image_data& imgData, Rect& rect, int i0, int j0);
+	int blockSize = 5;
+	void setNewIntensity(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0);
 public:
-	Threshold(int num = 5) {
-		blockSize = num;
-	};
 	void set(image_data& imgData, Rect& rect) override;
 };
 
 class Blur : public Filter {
+	int blockSize = 3;
 	void blurPixel(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0);
 public:
 	Blur() {};
@@ -42,7 +40,9 @@ public:
 };
 
 class Edge : public Filter {
+	int blockSize = 3;
 	void edgePixel(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0);
+	int clump(int a);
 public:
 	Edge() {};
 	void set(image_data& imgData, Rect& rect) override;

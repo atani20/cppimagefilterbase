@@ -40,43 +40,43 @@ void BlackAndWhite::set(image_data& imgData, Rect& rect) {
 }
 
 
-void Threshold::setNewIntensity(image_data& imgData, Rect& rect, int i0, int j0) {
-	vector <stbi_uc*> arrIntensity;
-	for (int i = i0; i < i0 + blockSize; i++) {
-		for (int j = j0; j < j0 + blockSize; j++) {
-			if (i >= rect.getBottom() || j >= rect.getRight())
+void Threshold::setNewIntensity(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0) {
+	int delta = blockSize / 2;
+	vector <char> intensity;
+	for (int i = i0 - delta; i <= i0 + delta; i++) {
+		for (int j = j0 - delta; j <= j0 + delta; j++) {
+			if (i < rect.getTop() || i >= rect.getBottom() || j < rect.getLeft() || j >= rect.getRight()) {
 				continue;
-			else {
-				int pos = imgData.compPerPixel * (i * imgData.w + j);
-				arrIntensity.push_back(imgData.pixels + pos);
 			}
+			int pos = imgData.compPerPixel * (i * imgData.w + j);
+			intensity.push_back(imgOriginal.pixels[pos]);
 		}
 	}
-	sort(arrIntensity.begin(), arrIntensity.end(), [](stbi_uc* a, stbi_uc* b) ->bool
-	{
-		return *a < *b;
-	});
-	for (int i = 0; i < arrIntensity.size() / 2; i++) {
-		*arrIntensity[i] = 0;
-		*(arrIntensity[i] + 1) = 0;
-		*(arrIntensity[i] + 2) = 0;
-	}
+	sort(intensity.begin(), intensity.end());
+	int pos = imgData.compPerPixel * (i0 * imgData.w + j0);
+	int newIntens = imgOriginal.pixels[pos] < intensity[intensity.size() / 2] ? 0 : imgOriginal.pixels[pos];
+	imgData.pixels[pos] = newIntens;
+	imgData.pixels[pos + 1] = newIntens;
+	imgData.pixels[pos + 2] = newIntens;
 }
 void Threshold::set(image_data& imgData, Rect& rect) {
 	BlackAndWhite bw;
 	bw.set(imgData, rect);
-	for (int i = rect.getTop(); i < rect.getBottom(); i += blockSize) {
-		for (int j = rect.getLeft(); j < rect.getRight(); j += blockSize) {
-			setNewIntensity(imgData, rect, i, j);
+	image_data imgOriginal = copy(imgData);
+	for (int i = rect.getTop(); i < rect.getBottom(); i++) {
+		for (int j = rect.getLeft(); j < rect.getRight(); j++) {
+			setNewIntensity(imgData, imgOriginal, rect, i, j);
 		}
 	}
+	delete[]imgOriginal.pixels;
 }
 
 
 void  Blur::blurPixel(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0) {
 	int sum[3] = { 0 };
-	for (int i = i0 - 1; i <= i0 + 1; i++) {
-		for (int j = j0 - 1; j <= j0 + 1; j++) {
+	int delta = blockSize / 2;
+	for (int i = i0 - delta; i <= i0 + delta; i++) {
+		for (int j = j0 - delta; j <= j0 + delta; j++) {
 			if (i < rect.getTop() || i >= rect.getBottom() || j < rect.getLeft() || j >= rect.getRight())
 				continue;
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
@@ -100,10 +100,20 @@ void  Blur::set(image_data& imgData, Rect& rect) {
 	delete[]imgOriginal.pixels;
 }
 
+int Edge::clump(int num) {
+	if (num >= 0 && num <= 255)
+		return (char)num;
+	else if (num < 0)
+		return 0;
+	else
+		return 255;
+}
+
 void Edge::edgePixel(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0) {
 	int sum = 0;
-	for (int i = i0 - 1; i <= i0 + 1; i++) {
-		for (int j = j0 - 1; j <= j0 + 1; j++) {
+	int delta = blockSize / 2;
+	for (int i = i0 - delta; i <= i0 + delta; i++) {
+		for (int j = j0 - delta; j <= j0 + delta; j++) {
 			if (i < rect.getTop() || i >= rect.getBottom() || j < rect.getLeft() || j >= rect.getRight())
 				continue;
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
@@ -116,10 +126,11 @@ void Edge::edgePixel(image_data& imgData, image_data& imgOriginal, Rect& rect, i
 		}
 	}
 	sum /= 9;
+	int color = clump(sum);
 	int pos = imgData.compPerPixel * (i0 * imgData.w + j0);
-	imgData.pixels[pos] = sum;
-	imgData.pixels[pos + 1] = sum;
-	imgData.pixels[pos + 2] = sum;
+	imgData.pixels[pos] = color;
+	imgData.pixels[pos + 1] = color;
+	imgData.pixels[pos + 2] = color;
 }
 void Edge::set(image_data& imgData, Rect& rect) {
 	BlackAndWhite bw;
