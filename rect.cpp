@@ -1,7 +1,7 @@
 #include "rect.h"
 
 
-Rect::Rect(int l, int t, int r, int b) : left(l), top(t), right(r), bottom(b) {};
+Rect::Rect(int t, int l,  int b, int r) : top(t),left(l), bottom(b), right(r) {};
 int Rect::CalcCoord(int coef, int size) {
 	return (coef == 0) ? 0 : size / coef;
 }

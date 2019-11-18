@@ -1,10 +1,10 @@
 #pragma once
 
 class Rect {
-	int left, top, right, bottom;
+	int top, left, bottom, right;
 	int CalcCoord(int coef, int size);
 public:
-	Rect(int l, int t, int r, int b);
+	Rect(int t, int l, int b, int r);
 	int getLeft();
 	int getTop();
 	int getRight();

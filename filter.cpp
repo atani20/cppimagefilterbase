@@ -1,5 +1,6 @@
 #include <string>
 #include <map>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 #include "filter.h"
@@ -7,7 +8,7 @@
 #include <iostream>
 using namespace std;
 
-image_data  Filter:: copy(image_data& imgData) {
+image_data  Filter:: copy(image_data const& imgData) {
 	image_data imgOriginal;
 	int size = imgData.w * imgData.h * imgData.compPerPixel;
 	imgOriginal.pixels = new stbi_uc[size];
@@ -15,7 +16,7 @@ image_data  Filter:: copy(image_data& imgData) {
 	return imgOriginal;
 }
 
-void Red::set(image_data& imgData, Rect& rect) {
+void Red:: set(image_data& imgData, Rect &rect) {
 	for (long i = rect.getTop(); i < rect.getBottom(); i++) {
 		for (long j = rect.getLeft(); j < rect.getRight(); j++) {
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
@@ -27,7 +28,7 @@ void Red::set(image_data& imgData, Rect& rect) {
 }
 
 
-void BlackAndWhite::set(image_data& imgData, Rect& rect) {
+void BlackAndWhite::set(image_data& imgData, Rect &rect) {
 	for (long i = rect.getTop(); i < rect.getBottom(); i++) {
 		for (long j = rect.getLeft(); j < rect.getRight(); j++) {
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
@@ -40,9 +41,9 @@ void BlackAndWhite::set(image_data& imgData, Rect& rect) {
 }
 
 
-void Threshold::setNewIntensity(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0) {
+void Threshold::setNewIntensity(image_data& imgData, image_data& imgOriginal, Rect& rect, int const i0, int const j0) {
 	int delta = blockSize / 2;
-	vector <char> intensity;
+	vector <int> intensity;
 	for (int i = i0 - delta; i <= i0 + delta; i++) {
 		for (int j = j0 - delta; j <= j0 + delta; j++) {
 			if (i < rect.getTop() || i >= rect.getBottom() || j < rect.getLeft() || j >= rect.getRight()) {
@@ -109,7 +110,7 @@ int Edge::clump(int num) {
 		return 255;
 }
 
-void Edge::edgePixel(image_data& imgData, image_data& imgOriginal, Rect& rect, int i0, int j0) {
+void Edge::edgePixel(image_data& imgData, image_data const& imgOriginal, Rect & rect, int const i0, int const j0) {
 	int sum = 0;
 	int delta = blockSize / 2;
 	for (int i = i0 - delta; i <= i0 + delta; i++) {
