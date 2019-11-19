@@ -15,10 +15,16 @@ image_data  Filter:: copy(image_data const& imgData) {
 	memcpy(imgOriginal.pixels, imgData.pixels,  size);
 	return imgOriginal;
 }
+/*cout << endl << endl;
+		for (int i = 0; i < imgData.h; i++) {
+			for (int j = 0; j < imgData.w; j++)
+				cout << (int)imgData.pixels[imgData.compPerPixel * (i * imgData.w + j)] << " ";
+			cout << endl;
+		}*/
 
 void Red:: set(image_data& imgData, Rect &rect) {
-	for (long i = rect.getTop(); i < rect.getBottom(); i++) {
-		for (long j = rect.getLeft(); j < rect.getRight(); j++) {
+	for (int i = rect.getTop(); i < rect.getBottom(); i++) {
+		 for (int j = rect.getLeft(); j < rect.getRight(); j++){
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
 			imgData.pixels[pos] = 255;
 			imgData.pixels[pos + 1] = 0;
@@ -32,7 +38,7 @@ void BlackAndWhite::set(image_data& imgData, Rect &rect) {
 	for (long i = rect.getTop(); i < rect.getBottom(); i++) {
 		for (long j = rect.getLeft(); j < rect.getRight(); j++) {
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
-			int intensity = (3 * imgData.pixels[pos] + 6 * imgData.pixels[pos + 1] + imgData.pixels[pos + 2]) / 10;
+			int intensity = 0.3 * imgData.pixels[pos] + 0.6 * imgData.pixels[pos + 1] + 0.1*imgData.pixels[pos + 2];
 			imgData.pixels[pos] = intensity;
 			imgData.pixels[pos + 1] = intensity;
 			imgData.pixels[pos + 2] = intensity;
@@ -102,12 +108,11 @@ void  Blur::set(image_data& imgData, Rect& rect) {
 }
 
 int Edge::clump(int num) {
-	if (num >= 0 && num <= 255)
-		return (char)num;
-	else if (num < 0)
+	if (num < 0)
 		return 0;
-	else
+	else if (num > 255)
 		return 255;
+	return num;
 }
 
 void Edge::edgePixel(image_data& imgData, image_data const& imgOriginal, Rect & rect, int const i0, int const j0) {
@@ -126,7 +131,6 @@ void Edge::edgePixel(image_data& imgData, image_data const& imgOriginal, Rect & 
 			}
 		}
 	}
-	sum /= 9;
 	int color = clump(sum);
 	int pos = imgData.compPerPixel * (i0 * imgData.w + j0);
 	imgData.pixels[pos] = color;

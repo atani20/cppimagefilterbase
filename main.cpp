@@ -45,7 +45,7 @@ int main( int argc, char *argv[] )
 			throw "Not enough arguments";
 			return 0;
 		}
-        png_toolkit studTool;
+		png_toolkit studTool;
         studTool.load(argv[2]);
 		vector <pair<string, Rect>> config = ParseConfig(argv[1]);
 		image_data imgData = studTool.getPixelData();
