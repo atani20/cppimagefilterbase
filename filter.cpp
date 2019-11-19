@@ -38,7 +38,7 @@ void BlackAndWhite::set(image_data& imgData, Rect &rect) {
 	for (long i = rect.getTop(); i < rect.getBottom(); i++) {
 		for (long j = rect.getLeft(); j < rect.getRight(); j++) {
 			int pos = imgData.compPerPixel * (i * imgData.w + j);
-			int intensity = 0.3 * imgData.pixels[pos] + 0.6 * imgData.pixels[pos + 1] + 0.1*imgData.pixels[pos + 2];
+			int intensity = (3 * imgData.pixels[pos] + 6 * imgData.pixels[pos + 1] + imgData.pixels[pos + 2])/10;
 			imgData.pixels[pos] = intensity;
 			imgData.pixels[pos + 1] = intensity;
 			imgData.pixels[pos + 2] = intensity;
